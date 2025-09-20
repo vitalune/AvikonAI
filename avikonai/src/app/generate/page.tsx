@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { PromptInput } from '@/components/features/prompt-input';
@@ -12,7 +12,8 @@ import { GenerationProgress } from '@/components/features/generation-progress';
 import { useToast } from '@/hooks/use-toast';
 import { GeneratedImage, StylePreset, GenerationSettings as IGenerationSettings } from '@/types';
 import { mockImages, stylePresets } from '@/lib/mock-data';
-import { sleep } from '@/lib/utils';
+import { generateImageAPI, checkGeminiStatus } from '@/lib/api';
+import { fileToBase64 } from '@/lib/gemini';
 
 export default function GeneratePage() {
   const [prompt, setPrompt] = useState('');
@@ -27,8 +28,19 @@ export default function GeneratePage() {
   const [generatedImages, setGeneratedImages] = useState<GeneratedImage[]>(mockImages);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationProgress, setGenerationProgress] = useState(0);
+  const [isGeminiConfigured, setIsGeminiConfigured] = useState<boolean | null>(null);
 
   const { addToast } = useToast();
+
+  // Check Gemini API configuration on component mount
+  useEffect(() => {
+    checkGeminiStatus().then(({ configured, error }) => {
+      setIsGeminiConfigured(configured);
+      if (!configured) {
+        console.warn('Gemini API not configured:', error);
+      }
+    });
+  }, []);
 
   const handleGenerate = async () => {
     if (!prompt.trim()) {
@@ -40,27 +52,71 @@ export default function GeneratePage() {
       return;
     }
 
+    // Check if Gemini is configured
+    if (isGeminiConfigured === false) {
+      addToast({
+        type: 'error',
+        title: 'API Not Configured',
+        message: 'Gemini API key is not configured. Please check your environment variables.'
+      });
+      return;
+    }
+
     setIsGenerating(true);
     setGenerationProgress(0);
 
     try {
-      // Simulate generation progress
-      for (let i = 0; i <= 100; i += 10) {
-        setGenerationProgress(i);
-        await sleep(200);
+      // Prepare reference image if uploaded
+      let referenceImageBase64: string | undefined;
+      if (uploadedFiles.length > 0) {
+        setGenerationProgress(10);
+        referenceImageBase64 = await fileToBase64(uploadedFiles[0]);
       }
 
-      // Create new mock image
+      setGenerationProgress(25);
+
+      // Call the generation API
+      const response = await generateImageAPI({
+        prompt: prompt.trim(),
+        style: selectedStyle.description,
+        aspectRatio: settings.aspectRatio,
+        quality: settings.quality,
+        negativePrompt: settings.negativePrompt,
+        referenceImageBase64
+      });
+
+      setGenerationProgress(75);
+
+      if (!response.success || !response.imageData) {
+        throw new Error(response.error || 'Failed to generate image');
+      }
+
+      // Convert base64 to blob URL
+      const byteCharacters = atob(response.imageData);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: response.mimeType || 'image/png' });
+      const blobUrl = URL.createObjectURL(blob);
+
+      setGenerationProgress(90);
+
+      // Create new generated image
       const newImage: GeneratedImage = {
         id: Date.now().toString(),
-        url: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=512&h=512&fit=crop&crop=face',
+        url: blobUrl, // Use blob URL for display
+        blobUrl: blobUrl,
         prompt: prompt,
         style: selectedStyle.name,
         timestamp: new Date(),
-        isProcessing: false
+        isProcessing: false,
+        isGenerated: true
       };
 
       setGeneratedImages(prev => [newImage, ...prev]);
+      setGenerationProgress(100);
 
       addToast({
         type: 'success',
@@ -68,11 +124,14 @@ export default function GeneratePage() {
         message: 'Your AI profile picture has been created successfully.'
       });
 
-    } catch {
+    } catch (error) {
+      console.error('Generation error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Something went wrong. Please try again.';
+
       addToast({
         type: 'error',
         title: 'Generation Failed',
-        message: 'Something went wrong. Please try again.'
+        message: errorMessage
       });
     } finally {
       setIsGenerating(false);
@@ -155,15 +214,24 @@ export default function GeneratePage() {
             </CardContent>
           </Card>
 
+          {/* API Status Warning */}
+          {isGeminiConfigured === false && (
+            <div className="p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 rounded-lg">
+              <p className="text-sm text-yellow-800 dark:text-yellow-200">
+                ⚠️ Gemini API not configured. Set your GEMINI_API_KEY to enable real image generation.
+              </p>
+            </div>
+          )}
+
           {/* Generate Button */}
           <Button
             onClick={handleGenerate}
-            disabled={isGenerating || !prompt.trim()}
+            disabled={isGenerating || !prompt.trim() || isGeminiConfigured === false}
             isLoading={isGenerating}
             size="lg"
             className="w-full"
           >
-            {isGenerating ? 'Generating...' : 'Generate Image'}
+            {isGenerating ? 'Generating...' : isGeminiConfigured === false ? 'API Not Configured' : 'Generate Image'}
           </Button>
 
           {/* Progress */}

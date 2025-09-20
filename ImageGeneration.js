@@ -1,10 +1,10 @@
 import { GoogleGenAI } from "@google/genai";
-import * as fs from "node:fs";
+import * as fs from "node:fs";// for file read/write
 import readlineSync from "readline-sync"; 
 
 
 const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY,});
+  apiKey: process.env.GEMINI_API_KEY,});//create gemini ai instance
 
 
 
@@ -35,7 +35,7 @@ async function imageRaw() {
 
 
 async function imageUser() {
-  const imagePath = readlineSync.question("Enter path to reference image (e.g., ./cat.png): ");
+  const imagePath = readlineSync.question("Enter path to reference image");
   const imageData = fs.readFileSync(imagePath);
   const base64Image = imageData.toString("base64");
 
