@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { X, Download, Share2, Edit, Copy, Heart, MessageSquare } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { usePixoScript, usePixoEditor } from '@/hooks/pixo';
 
 interface ImagePreviewModalProps {
   image: GeneratedImage;
@@ -16,9 +17,96 @@ interface ImagePreviewModalProps {
 
 export function ImagePreviewModal({ image, isOpen, onClose }: ImagePreviewModalProps) {
   const [activeTab, setActiveTab] = useState<'details' | 'edit'>('details');
+  const [selectedImage, setSelectedImage] = useState<GeneratedImage | null>(image);
   const { addToast } = useToast();
+  const { isLoaded: isPixoLoaded, error: pixoError } = usePixoScript();
+
+  const { editImage } = usePixoEditor({
+    apiKey: process.env.NEXT_PUBLIC_PIXO_API_KEY!,
+    onSave: (result) => {
+      // Convert edited image to data URL
+      const editedImageUrl = result.toDataURL();
+
+      // Update the image in state
+      setSelectedImage(prev => prev ? {
+        ...prev,
+        url: editedImageUrl,
+        blobUrl: editedImageUrl,
+        isGenerated: true
+      } : null);
+
+      // Show success message
+      addToast({
+        type: 'success',
+        title: 'Image Edited',
+        message: 'Your image has been successfully edited.'
+      });
+    },
+    onCancel: () => {
+      console.log('Edit cancelled');
+    },
+    onClose: () => {
+      console.log('Editor closed');
+    },
+    theme: 'Default'
+  });
 
   if (!isOpen) return null;
+
+  const handleEditImage = async () => {
+    if (!isPixoLoaded) {
+      addToast({
+        type: 'error',
+        title: 'Editor Not Ready',
+        message: 'Please wait for the editor to load.'
+      });
+      return;
+    }
+
+    if (!process.env.NEXT_PUBLIC_PIXO_API_KEY) {
+      addToast({
+        type: 'error',
+        title: 'Editor Not Configured',
+        message: 'Image editor is not properly configured.'
+      });
+      return;
+    }
+
+    // Get the image source
+    const imageSource = selectedImage?.blobUrl || selectedImage?.url || image.url;
+
+    // Convert blob URL to base64 data URL if needed
+    let editableImageSource = imageSource;
+    if (imageSource.startsWith('blob:')) {
+      try {
+        const response = await fetch(imageSource);
+        const blob = await response.blob();
+        const reader = new FileReader();
+
+        editableImageSource = await new Promise<string>((resolve, reject) => {
+          reader.onloadend = () => {
+            if (typeof reader.result === 'string') {
+              resolve(reader.result);
+            } else {
+              reject(new Error('Failed to convert image'));
+            }
+          };
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+      } catch (error) {
+        console.error('Failed to convert blob URL:', error);
+        addToast({
+          type: 'error',
+          title: 'Image Conversion Failed',
+          message: 'Unable to prepare image for editing.'
+        });
+        return;
+      }
+    }
+
+    editImage(editableImageSource);
+  };
 
   const handleDownload = () => {
     addToast({
@@ -92,8 +180,8 @@ export function ImagePreviewModal({ image, isOpen, onClose }: ImagePreviewModalP
               <div className="space-y-4">
                 <div className="aspect-square overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-700">
                   <Image
-                    src={image.url}
-                    alt={image.prompt}
+                    src={selectedImage?.url || image.url}
+                    alt={selectedImage?.prompt || image.prompt}
                     width={600}
                     height={600}
                     className="w-full h-full object-cover"
@@ -196,18 +284,33 @@ export function ImagePreviewModal({ image, isOpen, onClose }: ImagePreviewModalP
 
                   {activeTab === 'edit' && (
                     <div className="space-y-4">
-                      <div className="text-center py-8">
-                        <Edit className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-                          Editing Tools Coming Soon
-                        </h3>
-                        <p className="text-gray-600 dark:text-gray-400 mb-4">
-                          Advanced editing features like background removal, style transfer, and enhancement tools will be available soon.
-                        </p>
-                        <Button variant="outline" onClick={() => setActiveTab('details')}>
-                          Back to Details
-                        </Button>
-                      </div>
+                      {pixoError ? (
+                        <div className="text-center py-8">
+                          <p className="text-red-600 dark:text-red-400 mb-4">
+                            Failed to load image editor
+                          </p>
+                          <Button variant="outline" onClick={() => window.location.reload()}>
+                            Reload Page
+                          </Button>
+                        </div>
+                      ) : !isPixoLoaded ? (
+                        <div className="text-center py-8">
+                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                          <p className="text-gray-600 dark:text-gray-400">
+                            Loading image editor...
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="text-center py-8">
+                          <Button onClick={handleEditImage} className="mb-4">
+                            <Edit className="w-4 h-4 mr-2" />
+                            Open Image Editor
+                          </Button>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">
+                            Edit your image with professional tools including filters, text, crop, and more.
+                          </p>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
