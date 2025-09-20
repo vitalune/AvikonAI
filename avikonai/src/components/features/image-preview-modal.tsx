@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { GeneratedImage } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -90,10 +91,13 @@ export function ImagePreviewModal({ image, isOpen, onClose }: ImagePreviewModalP
               {/* Image */}
               <div className="space-y-4">
                 <div className="aspect-square overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-700">
-                  <img
+                  <Image
                     src={image.url}
                     alt={image.prompt}
+                    width={600}
+                    height={600}
                     className="w-full h-full object-cover"
+                    unoptimized
                   />
                 </div>
 
@@ -117,12 +121,12 @@ export function ImagePreviewModal({ image, isOpen, onClose }: ImagePreviewModalP
                 {/* Tabs */}
                 <div className="flex space-x-1 bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
                   {[
-                    { id: 'details', label: 'Details', icon: MessageSquare },
-                    { id: 'edit', label: 'Edit', icon: Edit }
+                    { id: 'details' as const, label: 'Details', icon: MessageSquare },
+                    { id: 'edit' as const, label: 'Edit', icon: Edit }
                   ].map((tab) => (
                     <button
                       key={tab.id}
-                      onClick={() => setActiveTab(tab.id as any)}
+                      onClick={() => setActiveTab(tab.id)}
                       className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                         activeTab === tab.id
                           ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow'

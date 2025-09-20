@@ -45,14 +45,14 @@ export function GenerationSettings({ settings, onSettingsChange }: GenerationSet
         </label>
         <div className="grid grid-cols-2 gap-2">
           {[
-            { value: '1:1', label: 'Square (1:1)' },
-            { value: '4:3', label: 'Standard (4:3)' },
-            { value: '16:9', label: 'Wide (16:9)' },
-            { value: '9:16', label: 'Portrait (9:16)' }
+            { value: '1:1' as const, label: 'Square (1:1)' },
+            { value: '4:3' as const, label: 'Standard (4:3)' },
+            { value: '16:9' as const, label: 'Wide (16:9)' },
+            { value: '9:16' as const, label: 'Portrait (9:16)' }
           ].map((ratio) => (
             <button
               key={ratio.value}
-              onClick={() => updateSetting('aspectRatio', ratio.value as any)}
+              onClick={() => updateSetting('aspectRatio', ratio.value)}
               className={`p-3 text-sm rounded-lg border transition-colors ${
                 settings.aspectRatio === ratio.value
                   ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300'

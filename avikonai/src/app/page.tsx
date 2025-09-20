@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Sparkles, Zap, Palette, Download, Users, Shield } from 'lucide-react';
@@ -83,10 +84,13 @@ export default function Home() {
                 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200&h=200&fit=crop&crop=face'
               ].map((src, index) => (
                 <div key={index} className="aspect-square rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
-                  <img
+                  <Image
                     src={src}
                     alt={`Sample generated profile picture ${index + 1}`}
+                    width={200}
+                    height={200}
                     className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                    unoptimized
                   />
                 </div>
               ))}

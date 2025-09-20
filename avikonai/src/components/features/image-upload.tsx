@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useState, useRef, DragEvent } from 'react';
+import Image from 'next/image';
 import { Upload, X, Image as ImageIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { validateImageFile, formatFileSize } from '@/lib/utils';
@@ -179,10 +180,13 @@ export function ImageUpload({
               >
                 {/* Preview */}
                 {previews[index] ? (
-                  <img
+                  <Image
                     src={previews[index]}
                     alt={file.name}
+                    width={48}
+                    height={48}
                     className="w-12 h-12 object-cover rounded-lg"
+                    unoptimized
                   />
                 ) : (
                   <div className="w-12 h-12 bg-gray-200 dark:bg-gray-600 rounded-lg flex items-center justify-center">

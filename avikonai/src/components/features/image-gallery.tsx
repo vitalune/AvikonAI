@@ -1,12 +1,12 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { GeneratedImage } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Download, Share2, Edit, Trash2, ZoomIn } from 'lucide-react';
 import { ImagePreviewModal } from './image-preview-modal';
 import { useToast } from '@/hooks/use-toast';
-import { cn } from '@/lib/utils';
 
 interface ImageGalleryProps {
   images: GeneratedImage[];
@@ -35,7 +35,7 @@ export function ImageGallery({ images, isGenerating }: ImageGalleryProps) {
     if (navigator.share) {
       navigator.share({
         title: 'Check out my AI-generated profile picture!',
-        text: `Generated with prompt: "${image.prompt}"`,
+        text: `Generated with prompt: ${image.prompt}`,
         url: window.location.href
       });
     } else {
@@ -81,7 +81,7 @@ export function ImageGallery({ images, isGenerating }: ImageGalleryProps) {
           No images generated yet
         </h3>
         <p className="text-gray-500 dark:text-gray-400">
-          Enter a prompt and click "Generate Image" to create your first AI profile picture.
+          Enter a prompt and click &quot;Generate Image&quot; to create your first AI profile picture.
         </p>
       </div>
     );
@@ -107,10 +107,13 @@ export function ImageGallery({ images, isGenerating }: ImageGalleryProps) {
             className="group relative aspect-square bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden cursor-pointer hover:shadow-lg transition-all duration-200"
             onClick={() => setSelectedImage(image)}
           >
-            <img
+            <Image
               src={image.url}
               alt={image.prompt}
+              width={400}
+              height={400}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+              unoptimized
             />
 
             {/* Overlay */}

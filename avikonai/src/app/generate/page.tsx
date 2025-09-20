@@ -68,7 +68,7 @@ export default function GeneratePage() {
         message: 'Your AI profile picture has been created successfully.'
       });
 
-    } catch (error) {
+    } catch {
       addToast({
         type: 'error',
         title: 'Generation Failed',

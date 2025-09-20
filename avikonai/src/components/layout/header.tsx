@@ -23,7 +23,7 @@ export function Header() {
     const themeHook = useTheme();
     theme = themeHook.theme;
     toggleTheme = themeHook.toggleTheme;
-  } catch (error) {
+  } catch {
     // Theme provider not available during SSR
   }
 
