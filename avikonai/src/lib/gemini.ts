@@ -70,7 +70,7 @@ export async function generateImage(options: GenerateImageOptions): Promise<Gene
     }); //initialize the gemini model and loads the image
 
     
-    const contentParts = []; //holds data to send to gemeini
+    const contentParts: any[] = []; //holds data to send to gemini
 
     // Add reference image if provided
     if (referenceImageBase64) {
