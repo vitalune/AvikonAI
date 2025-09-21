@@ -9,6 +9,28 @@ import { X, Download, Share2, Edit, Copy, Heart, MessageSquare } from 'lucide-re
 import { useToast } from '@/hooks/use-toast';
 import { usePixoScript, usePixoEditor } from '@/hooks/pixo';
 
+// Local gallery persistence (client-only)
+type PersistedImage = {
+  id: string;
+  url: string; // data URL
+  prompt: string;
+  style: string;
+  timestamp: string; // ISO string
+};
+
+const GALLERY_STORAGE_KEY = 'app.images';
+
+function appendToLocalGallery(image: PersistedImage) {
+  if (typeof window === 'undefined') return;
+  try {
+    const raw = localStorage.getItem(GALLERY_STORAGE_KEY);
+    const list: PersistedImage[] = raw ? JSON.parse(raw) : [];
+    localStorage.setItem(GALLERY_STORAGE_KEY, JSON.stringify([image, ...list]));
+  } catch (e) {
+    console.error('Failed to save image to localStorage', e);
+  }
+}
+
 interface ImagePreviewModalProps {
   image: GeneratedImage;
   isOpen: boolean;
@@ -35,11 +57,20 @@ export function ImagePreviewModal({ image, isOpen, onClose }: ImagePreviewModalP
         isGenerated: true
       } : null);
 
+      // Persist to user's local gallery
+      appendToLocalGallery({
+        id: typeof crypto !== 'undefined' && 'randomUUID' in crypto ? crypto.randomUUID() : `${Date.now()}`,
+        url: editedImageUrl,
+        prompt: image.prompt,
+        style: image.style,
+        timestamp: new Date().toISOString()
+      });
+
       // Show success message
       addToast({
         type: 'success',
         title: 'Image Edited',
-        message: 'Your image has been successfully edited.'
+        message: 'Your image has been edited and saved to your library.'
       });
     },
     onCancel: () => {
@@ -106,6 +137,7 @@ export function ImagePreviewModal({ image, isOpen, onClose }: ImagePreviewModalP
     }
 
     editImage(editableImageSource);
+    onClose();
   };
 
   const handleDownload = () => {
@@ -237,7 +269,7 @@ export function ImagePreviewModal({ image, isOpen, onClose }: ImagePreviewModalP
                           Prompt
                         </label>
                         <div className="flex gap-2">
-                          <div className="flex-1 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg text-sm">
+                          <div className="flex-1 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg text-sm text-gray-700 dark:text-gray-300">
                             {image.prompt}
                           </div>
                           <Button
@@ -255,7 +287,7 @@ export function ImagePreviewModal({ image, isOpen, onClose }: ImagePreviewModalP
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                           Style
                         </label>
-                        <div className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg text-sm">
+                        <div className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg text-sm text-gray-700 dark:text-gray-300">
                           {image.style}
                         </div>
                       </div>

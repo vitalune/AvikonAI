@@ -11,9 +11,44 @@ import { ImageGallery } from '@/components/features/image-gallery';
 import { GenerationProgress } from '@/components/features/generation-progress';
 import { useToast } from '@/hooks/use-toast';
 import { GeneratedImage, StylePreset, GenerationSettings as IGenerationSettings } from '@/types';
-import { mockImages, stylePresets } from '@/lib/mock-data';
 import { generateImageAPI, checkGeminiStatus } from '@/lib/api';
 import { fileToBase64 } from '@/lib/gemini';
+import { stylePresets } from '@/lib/mock-data';
+
+// Local gallery persistence helper
+const GALLERY_STORAGE_KEY = 'app.images';
+
+function saveImageToStorage(image: GeneratedImage) {
+  if (typeof window === 'undefined') return;
+  try {
+    // Convert blob URL to data URL for storage
+    fetch(image.blobUrl || image.url)
+      .then(response => response.blob())
+      .then(blob => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          if (typeof reader.result === 'string') {
+            const storedImage = {
+              id: image.id,
+              url: reader.result, // data URL
+              prompt: image.prompt,
+              style: image.style,
+              timestamp: image.timestamp.toISOString(),
+              isGenerated: true
+            };
+            
+            const raw = localStorage.getItem(GALLERY_STORAGE_KEY);
+            const list = raw ? JSON.parse(raw) : [];
+            localStorage.setItem(GALLERY_STORAGE_KEY, JSON.stringify([storedImage, ...list]));
+          }
+        };
+        reader.readAsDataURL(blob);
+      })
+      .catch(console.error);
+  } catch (e) {
+    console.error('Failed to save image to localStorage', e);
+  }
+}
 
 export default function GeneratePage() {
   const [prompt, setPrompt] = useState('');
@@ -25,7 +60,7 @@ export default function GeneratePage() {
     negativePrompt: ''
   });
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
-  const [generatedImages, setGeneratedImages] = useState<GeneratedImage[]>(mockImages);
+  const [generatedImages, setGeneratedImages] = useState<GeneratedImage[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationProgress, setGenerationProgress] = useState(0);
   const [isGeminiConfigured, setIsGeminiConfigured] = useState<boolean | null>(null);
@@ -115,13 +150,16 @@ export default function GeneratePage() {
         isGenerated: true
       };
 
+      // Save to localStorage immediately
+      saveImageToStorage(newImage);
+
       setGeneratedImages(prev => [newImage, ...prev]);
       setGenerationProgress(100);
 
       addToast({
         type: 'success',
         title: 'Image Generated!',
-        message: 'Your AI profile picture has been created successfully.'
+        message: 'Your AI profile picture has been created and saved to your gallery.'
       });
 
     } catch (error) {

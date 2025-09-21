@@ -22,7 +22,7 @@ Tailwind CSS is a utility-first CSS framework that provides low-level utility cl
 <div class="mx-auto flex max-w-sm items-center gap-x-4 rounded-xl bg-white p-6 shadow-lg">
   <img class="size-12 shrink-0" src="/img/logo.svg" alt="ChitChat Logo" />
   <div>
-    <div class="text-xl font-medium text-black">ChitChat</div>
+    <div class="text-xl font-medium">ChitChat</div>
     <p class="text-gray-500">You have a new message!</p>
   </div>
 </div>

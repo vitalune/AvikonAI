@@ -1,26 +1,24 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { ImageGallery } from '@/components/features/image-gallery';
-import { mockImages } from '@/lib/mock-data';
+import type { GeneratedImage } from '@/types';
+import { loadStoredImages } from '@/lib/storage/images';
 import { Search, Filter, Grid, List } from 'lucide-react';
 
 export default function GalleryPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [filterStyle, setFilterStyle] = useState<string>('all');
+  const [images, setImages] = useState<GeneratedImage[]>([]);
 
-  const filteredImages = mockImages.filter(image => {
-    const matchesSearch = image.prompt.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         image.style.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesFilter = filterStyle === 'all' || image.style === filterStyle;
-    return matchesSearch && matchesFilter;
-  });
-
-  const styles = ['all', ...Array.from(new Set(mockImages.map(img => img.style)))];
+  useEffect(() => {
+    const list = loadStoredImages();
+    setImages(list);
+  }, []);
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
@@ -57,11 +55,6 @@ export default function GalleryPage() {
               onChange={(e) => setFilterStyle(e.target.value)}
               className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
             >
-              {styles.map(style => (
-                <option key={style} value={style}>
-                  {style === 'all' ? 'All Styles' : style}
-                </option>
-              ))}
             </select>
 
             {/* View mode */}
@@ -92,24 +85,21 @@ export default function GalleryPage() {
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
             Images
-            <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
-              {filteredImages.length} result{filteredImages.length !== 1 ? 's' : ''}
-            </span>
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {filteredImages.length === 0 ? (
+          {images.length === 0 ? (
             <div className="text-center py-12">
               <Filter className="w-12 h-12 text-gray-400 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
                 No images found
               </h3>
               <p className="text-gray-500 dark:text-gray-400">
-                Try adjusting your search terms or filters.
+                Generate or edit an image to see it here.
               </p>
             </div>
           ) : (
-            <ImageGallery images={filteredImages} />
+            <ImageGallery images={images} />
           )}
         </CardContent>
       </Card>

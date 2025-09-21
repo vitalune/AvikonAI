@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Sparkles, Zap, Palette, Download, Users, Shield } from 'lucide-react';
@@ -75,26 +74,6 @@ export default function Home() {
               </Button>
             </div>
 
-            {/* Sample images showcase */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-2xl mx-auto">
-              {[
-                'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face',
-                'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=200&h=200&fit=crop&crop=face',
-                'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop&crop=face',
-                'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200&h=200&fit=crop&crop=face'
-              ].map((src, index) => (
-                <div key={index} className="aspect-square rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
-                  <Image
-                    src={src}
-                    alt={`Sample generated profile picture ${index + 1}`}
-                    width={200}
-                    height={200}
-                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                    unoptimized
-                  />
-                </div>
-              ))}
-            </div>
           </div>
         </div>
       </section>
@@ -147,7 +126,7 @@ export default function Home() {
             <Button size="lg" variant="secondary" asChild>
               <Link href="/generate">
                 <Sparkles className="w-5 h-5 mr-2" />
-                Get Started for Free
+                Get Started
               </Link>
             </Button>
           </div>
@@ -164,16 +143,10 @@ export default function Home() {
               </div>
               <span className="text-xl font-bold text-white">AvikonAI</span>
             </div>
-
-            <div className="flex space-x-6 text-gray-400">
-              <Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link>
-              <Link href="/terms" className="hover:text-white transition-colors">Terms</Link>
-              <Link href="/contact" className="hover:text-white transition-colors">Contact</Link>
-            </div>
           </div>
 
           <div className="mt-8 pt-8 border-t border-gray-800 text-center text-gray-400">
-            <p>&copy; 2024 AvikonAI. All rights reserved.</p>
+            <p>&copy; 2025 AvikonAI - The Strongest AI PFP Editor</p>
           </div>
         </div>
       </footer>
