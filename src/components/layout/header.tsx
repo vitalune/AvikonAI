@@ -2,9 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useTheme } from '@/hooks/use-theme';
 import { Button } from '@/components/ui/button';
-import { Sun, Moon, Menu, X, Sparkles } from 'lucide-react';
+import { Menu, X, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export function Header() {
@@ -15,17 +14,6 @@ export function Header() {
     setMounted(true);
   }, []);
 
-  // Only use theme after component is mounted
-  let theme = 'light';
-  let toggleTheme = () => {};
-
-  try {
-    const themeHook = useTheme();
-    theme = themeHook.theme;
-    toggleTheme = themeHook.toggleTheme;
-  } catch {
-    // Theme provider not available during SSR
-  }
 
   const navigation = [
     { name: 'Home', href: '/' },
@@ -62,23 +50,6 @@ export function Header() {
 
           {/* Actions */}
           <div className="flex items-center space-x-4">
-            {/* Theme Toggle */}
-            {mounted && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={toggleTheme}
-                className="w-9 h-9 p-0"
-                aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
-              >
-                {theme === 'light' ? (
-                  <Moon className="w-4 h-4" />
-                ) : (
-                  <Sun className="w-4 h-4" />
-                )}
-              </Button>
-            )}
-
             {/* Get Started Button */}
             <div className="hidden sm:block">
               <Button asChild className="gradient-primary text-white hover:opacity-90 transition-all duration-300 glow-hover">

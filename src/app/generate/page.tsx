@@ -6,11 +6,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { PromptInput } from '@/components/features/prompt-input';
 import { StyleSelector } from '@/components/features/style-selector';
 import { ImageUpload } from '@/components/features/image-upload';
-import { GenerationSettings } from '@/components/features/generation-settings';
 import { ImageGallery } from '@/components/features/image-gallery';
 import { GenerationProgress } from '@/components/features/generation-progress';
 import { useToast } from '@/hooks/use-toast';
-import { GeneratedImage, StylePreset, GenerationSettings as IGenerationSettings } from '@/types';
+import { GeneratedImage, StylePreset } from '@/types';
 import { generateImageAPI, checkGeminiStatus } from '@/lib/api';
 import { fileToBase64 } from '@/lib/gemini';
 import { stylePresets } from '@/lib/mock-data';
@@ -54,12 +53,6 @@ function saveImageToStorage(image: GeneratedImage) {
 export default function GeneratePage() {
   const [prompt, setPrompt] = useState('');
   const [selectedStyle, setSelectedStyle] = useState<StylePreset>(stylePresets[0]);
-  const [settings, setSettings] = useState<IGenerationSettings>({
-    style: stylePresets[0].id,
-    quality: 8,
-    aspectRatio: '1:1',
-    negativePrompt: ''
-  });
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [generatedImages, setGeneratedImages] = useState<GeneratedImage[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -115,9 +108,8 @@ export default function GeneratePage() {
       const response = await generateImageAPI({
         prompt: prompt.trim(),
         style: selectedStyle.description,
-        aspectRatio: settings.aspectRatio,
-        quality: settings.quality,
-        negativePrompt: settings.negativePrompt,
+        aspectRatio: '1:1',
+        quality: 8,
         referenceImageBase64
       });
 
@@ -180,7 +172,6 @@ export default function GeneratePage() {
 
   const handleStyleChange = (style: StylePreset) => {
     setSelectedStyle(style);
-    setSettings(prev => ({ ...prev, style: style.id }));
   };
 
   return (
@@ -256,18 +247,6 @@ export default function GeneratePage() {
             </CardContent>
           </Card>
 
-          {/* Generation Settings */}
-          <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-0 glow-hover">
-            <CardHeader>
-              <CardTitle className="text-gradient-primary">Settings</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <GenerationSettings
-                settings={settings}
-                onSettingsChange={setSettings}
-              />
-            </CardContent>
-          </Card>
 
           {/* API Status Warning */}
           {isGeminiConfigured === false && (
