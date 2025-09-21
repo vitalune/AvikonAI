@@ -41,6 +41,6 @@ yarn-error.log*
 next-env.d.ts
 
 # directions
-.claude
-.playwright-mcp
+.claude/
+.playwright-mcp/
 node_modules
