@@ -14,6 +14,7 @@ import { GeneratedImage, StylePreset, GenerationSettings as IGenerationSettings 
 import { generateImageAPI, checkGeminiStatus } from '@/lib/api';
 import { fileToBase64 } from '@/lib/gemini';
 import { stylePresets } from '@/lib/mock-data';
+import { motion } from 'framer-motion';
 
 // Local gallery persistence helper
 const GALLERY_STORAGE_KEY = 'app.images';
@@ -183,23 +184,39 @@ export default function GeneratePage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-7xl">
-      <div className="mb-8">
+    <div className="container mx-auto px-4 py-8 max-w-7xl relative">
+      {/* Background decoration */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 w-64 h-64 gradient-secondary rounded-full filter blur-3xl opacity-10"></div>
+        <div className="absolute bottom-20 right-10 w-80 h-80 gradient-primary rounded-full filter blur-3xl opacity-10"></div>
+      </div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        className="mb-8 relative"
+      >
         <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-2">
-          AI Profile Picture Generator
+          AI <span className="text-gradient-primary">Profile Picture</span> Generator
         </h1>
         <p className="text-lg text-gray-600 dark:text-gray-300">
           Create stunning, personalized profile pictures with advanced AI technology
         </p>
-      </div>
+      </motion.div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 relative">
         {/* Left Column - Controls */}
-        <div className="lg:col-span-1 space-y-6">
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="lg:col-span-1 space-y-6"
+        >
           {/* Prompt Input */}
-          <Card>
+          <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-0 glow-hover">
             <CardHeader>
-              <CardTitle>Describe Your Image</CardTitle>
+              <CardTitle className="text-gradient-primary">Describe Your Image</CardTitle>
             </CardHeader>
             <CardContent>
               <PromptInput
@@ -211,9 +228,9 @@ export default function GeneratePage() {
           </Card>
 
           {/* Style Selection */}
-          <Card>
+          <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-0 glow-hover">
             <CardHeader>
-              <CardTitle>Choose Style</CardTitle>
+              <CardTitle className="text-gradient-primary">Choose Style</CardTitle>
             </CardHeader>
             <CardContent>
               <StyleSelector
@@ -225,9 +242,9 @@ export default function GeneratePage() {
           </Card>
 
           {/* Reference Image Upload */}
-          <Card>
+          <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-0 glow-hover">
             <CardHeader>
-              <CardTitle>Reference Image (Optional)</CardTitle>
+              <CardTitle className="text-gradient-primary">Reference Image (Optional)</CardTitle>
             </CardHeader>
             <CardContent>
               <ImageUpload
@@ -240,9 +257,9 @@ export default function GeneratePage() {
           </Card>
 
           {/* Generation Settings */}
-          <Card>
+          <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-0 glow-hover">
             <CardHeader>
-              <CardTitle>Settings</CardTitle>
+              <CardTitle className="text-gradient-primary">Settings</CardTitle>
             </CardHeader>
             <CardContent>
               <GenerationSettings
@@ -267,26 +284,44 @@ export default function GeneratePage() {
             disabled={isGenerating || !prompt.trim() || isGeminiConfigured === false}
             isLoading={isGenerating}
             size="lg"
-            className="w-full"
+            className="w-full gradient-primary text-white hover:opacity-90 transition-all duration-300 glow-hover font-semibold"
           >
             {isGenerating ? 'Generating...' : isGeminiConfigured === false ? 'API Not Configured' : 'Generate Image'}
           </Button>
 
           {/* Progress */}
           {isGenerating && (
-            <GenerationProgress progress={generationProgress} />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.3 }}
+            >
+              <GenerationProgress progress={generationProgress} />
+            </motion.div>
           )}
-        </div>
+        </motion.div>
 
         {/* Right Column - Results */}
-        <div className="lg:col-span-2">
-          <Card>
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+          className="lg:col-span-2"
+        >
+          <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-0 glow-hover">
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
-                Generated Images
-                <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
+                <span className="text-gradient-primary">Generated Images</span>
+                <motion.span
+                  key={generatedImages.length}
+                  initial={{ scale: 1.2, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ duration: 0.3 }}
+                  className="text-sm font-normal text-gray-500 dark:text-gray-400"
+                >
                   {generatedImages.length} image{generatedImages.length !== 1 ? 's' : ''}
-                </span>
+                </motion.span>
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -296,7 +331,7 @@ export default function GeneratePage() {
               />
             </CardContent>
           </Card>
-        </div>
+        </motion.div>
       </div>
     </div>
   );

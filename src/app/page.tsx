@@ -1,7 +1,10 @@
+'use client';
+
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Sparkles, Zap, Palette, Download, Users, Shield } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export default function Home() {
   const features = [
@@ -41,80 +44,141 @@ export default function Home() {
     <div className="flex flex-col">
       {/* Hero Section */}
       <section className="relative py-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
-        {/* Background gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-900 dark:to-purple-900/20" />
+        {/* Animated Background gradient */}
+        <div className="absolute inset-0 gradient-animated-slow opacity-20 dark:opacity-10" />
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-50/80 via-white/90 to-teal-50/80 dark:from-gray-900/90 dark:via-gray-900/95 dark:to-emerald-900/20" />
+
+        {/* Floating Particles */}
+        <div className="floating-particles">
+          <div className="particle"></div>
+          <div className="particle"></div>
+          <div className="particle"></div>
+          <div className="particle"></div>
+        </div>
 
         {/* Content */}
         <div className="relative max-w-7xl mx-auto">
           <div className="text-center">
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 dark:text-white mb-6">
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 dark:text-white mb-6"
+            >
               Create Stunning
-              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent block">
+              <motion.span
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+                className="text-gradient-animated block"
+              >
                 AI Profile Pictures
-              </span>
-            </h1>
+              </motion.span>
+            </motion.h1>
 
-            <p className="text-xl sm:text-2xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
+              className="text-xl sm:text-2xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed"
+            >
               Transform your online presence with AI-generated profile pictures that capture your unique style.
               Professional, artistic, or creative - the choice is yours.
-            </p>
+            </motion.p>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-              <Button size="lg" asChild>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.6, ease: "easeOut" }}
+              className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12"
+            >
+              <Button size="lg" asChild className="gradient-primary text-white hover:opacity-90 transition-all duration-300 glow-hover">
                 <Link href="/generate">
                   <Sparkles className="w-5 h-5 mr-2" />
                   Start Creating
                 </Link>
               </Button>
 
-              <Button variant="outline" size="lg" asChild>
+              <Button variant="outline" size="lg" asChild className="border-teal-500 text-teal-600 hover:bg-teal-50 dark:border-teal-400 dark:text-teal-400 dark:hover:bg-teal-900/20">
                 <Link href="#features">
                   Learn More
                 </Link>
               </Button>
-            </div>
+            </motion.div>
 
           </div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-20 px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-800">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
+      <section id="features" className="py-20 px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-800 relative overflow-hidden">
+        {/* Subtle background pattern */}
+        <div className="absolute inset-0 opacity-5">
+          <div className="absolute top-0 left-0 w-72 h-72 gradient-primary rounded-full filter blur-3xl"></div>
+          <div className="absolute bottom-0 right-0 w-96 h-96 gradient-secondary rounded-full filter blur-3xl"></div>
+        </div>
+
+        <div className="max-w-7xl mx-auto relative">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true, margin: "-100px" }}
+            className="text-center mb-16"
+          >
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-4">
-              Why Choose AvikonAI?
+              Why Choose <span className="text-gradient-primary">AvikonAI</span>?
             </h2>
             <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
               Experience the future of profile picture generation with our advanced AI technology and user-friendly interface.
             </p>
-          </div>
+          </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {features.map((feature, index) => (
-              <Card key={index} className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                <CardContent className="p-6">
-                  <div className="flex items-center mb-4">
-                    <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg group-hover:scale-110 transition-transform duration-300">
-                      <feature.icon className="w-6 h-6 text-white" />
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                viewport={{ once: true, margin: "-50px" }}
+              >
+                <Card className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 glow-hover border-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
+                  <CardContent className="p-6">
+                    <div className="flex items-center mb-4">
+                      <div className="flex items-center justify-center w-12 h-12 gradient-primary rounded-lg group-hover:scale-110 transition-transform duration-300 glow-primary">
+                        <feature.icon className="w-6 h-6 text-white" />
+                      </div>
                     </div>
-                  </div>
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                    {feature.title}
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-300">
-                    {feature.description}
-                  </p>
-                </CardContent>
-              </Card>
+                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                      {feature.title}
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-300">
+                      {feature.description}
+                    </p>
+                  </CardContent>
+                </Card>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-blue-600 to-purple-600">
-        <div className="max-w-4xl mx-auto text-center">
+      <section className="py-20 px-4 sm:px-6 lg:px-8 gradient-primary relative overflow-hidden">
+        {/* Animated background elements */}
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute top-1/2 left-1/4 w-32 h-32 bg-white rounded-full filter blur-xl animate-pulse"></div>
+          <div className="absolute top-1/3 right-1/4 w-24 h-24 bg-teal-200 rounded-full filter blur-xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+        </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          viewport={{ once: true }}
+          className="max-w-4xl mx-auto text-center relative"
+        >
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
             Ready to Transform Your Profile?
           </h2>
@@ -123,14 +187,14 @@ export default function Home() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" variant="secondary" asChild>
+            <Button size="lg" variant="secondary" asChild className="bg-white text-blue-600 hover:bg-blue-50 font-semibold glow-hover">
               <Link href="/generate">
                 <Sparkles className="w-5 h-5 mr-2" />
                 Get Started
               </Link>
             </Button>
           </div>
-        </div>
+        </motion.div>
       </section>
 
       {/* Footer */}
@@ -138,7 +202,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center space-x-2 mb-4 md:mb-0">
-              <div className="flex items-center justify-center w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg">
+              <div className="flex items-center justify-center w-8 h-8 gradient-primary rounded-lg glow-primary">
                 <Sparkles className="w-4 h-4 text-white" />
               </div>
               <span className="text-xl font-bold text-white">AvikonAI</span>

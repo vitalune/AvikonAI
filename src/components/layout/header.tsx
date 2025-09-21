@@ -38,11 +38,11 @@ export function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2">
-            <div className="flex items-center justify-center w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg">
+          <Link href="/" className="flex items-center space-x-2 group">
+            <div className="flex items-center justify-center w-8 h-8 gradient-primary rounded-lg glow-primary group-hover:scale-110 transition-transform duration-300">
               <Sparkles className="w-4 h-4 text-white" />
             </div>
-            <span className="text-xl font-bold text-gray-900 dark:text-white">
+            <span className="text-xl font-bold text-gradient-primary">
               AvikonAI
             </span>
           </Link>
@@ -53,7 +53,7 @@ export function Header() {
               <Link
                 key={item.name}
                 href={item.href}
-                className="text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 font-medium transition-colors"
+                className="text-gray-700 hover:text-teal-600 dark:text-gray-300 dark:hover:text-teal-400 font-medium transition-colors relative group"
               >
                 {item.name}
               </Link>
@@ -81,7 +81,7 @@ export function Header() {
 
             {/* Get Started Button */}
             <div className="hidden sm:block">
-              <Button asChild>
+              <Button asChild className="gradient-primary text-white hover:opacity-90 transition-all duration-300 glow-hover">
                 <Link href="/generate">Get Started</Link>
               </Button>
             </div>
@@ -117,14 +117,14 @@ export function Header() {
               <Link
                 key={item.name}
                 href={item.href}
-                className="px-2 py-2 text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400 font-medium transition-colors"
+                className="px-2 py-2 text-gray-700 hover:text-teal-600 dark:text-gray-300 dark:hover:text-teal-400 font-medium transition-colors"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 {item.name}
               </Link>
             ))}
             <div className="pt-2">
-              <Button asChild className="w-full">
+              <Button asChild className="w-full gradient-primary text-white hover:opacity-90 transition-all duration-300 glow-hover">
                 <Link href="/generate" onClick={() => setMobileMenuOpen(false)}>
                   Get Started
                 </Link>
