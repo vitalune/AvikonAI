@@ -82,8 +82,8 @@ export default function Home() {
               transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
               className="text-xl sm:text-2xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed"
             >
-              Transform your online presence with AI-generated profile pictures that capture your unique style.
-              Professional, artistic, or creative - the choice is yours.
+              Transform your online presence with the most powerful AI image generation and editing tools.
+              With endless possibilities, your unique style comes to life. 
             </motion.p>
 
             <motion.div

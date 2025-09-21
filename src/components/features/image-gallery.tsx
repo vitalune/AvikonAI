@@ -17,15 +17,44 @@ export function ImageGallery({ images, isGenerating }: ImageGalleryProps) {
   const [selectedImage, setSelectedImage] = useState<GeneratedImage | null>(null);
   const { addToast } = useToast();
 
-  const handleDownload = (image: GeneratedImage, e: React.MouseEvent) => {
+  const handleDownload = async (image: GeneratedImage, e: React.MouseEvent) => {
     e.stopPropagation();
 
-    // Mock download functionality
-    addToast({
-      type: 'success',
-      title: 'Download Started',
-      message: 'Your image is being downloaded.'
-    });
+    try {
+      // Get image source (blob URL or data URL)
+      const imageSource = image.blobUrl || image.url;
+
+      // Fetch the image
+      const response = await fetch(imageSource);
+      const blob = await response.blob();
+
+      // Create a download link
+      const downloadUrl = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = `avikonai-${image.id}.png`;
+
+      // Trigger download
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      // Clean up the blob URL
+      URL.revokeObjectURL(downloadUrl);
+
+      addToast({
+        type: 'success',
+        title: 'Download Complete',
+        message: 'Your HD image has been downloaded successfully.'
+      });
+    } catch (error) {
+      console.error('Download failed:', error);
+      addToast({
+        type: 'error',
+        title: 'Download Failed',
+        message: 'Unable to download the image. Please try again.'
+      });
+    }
   };
 
   const handleShare = (image: GeneratedImage, e: React.MouseEvent) => {

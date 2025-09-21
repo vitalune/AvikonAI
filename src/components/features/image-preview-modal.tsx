@@ -140,12 +140,51 @@ export function ImagePreviewModal({ image, isOpen, onClose }: ImagePreviewModalP
     onClose();
   };
 
-  const handleDownload = () => {
-    addToast({
-      type: 'success',
-      title: 'Download Started',
-      message: 'Your high-resolution image is being downloaded.'
-    });
+  const handleDownload = async () => {
+    try {
+      // Get image source from current state or fallback to original
+      const imageSource = selectedImage?.blobUrl || selectedImage?.url || image.blobUrl || image.url;
+
+      // If it's a blob URL, fetch it directly
+      let blob: Blob;
+      if (imageSource.startsWith('blob:') || imageSource.startsWith('http')) {
+        const response = await fetch(imageSource);
+        blob = await response.blob();
+      } else if (imageSource.startsWith('data:')) {
+        // Convert data URL to blob
+        const response = await fetch(imageSource);
+        blob = await response.blob();
+      } else {
+        throw new Error('Invalid image source');
+      }
+
+      // Create download link
+      const downloadUrl = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = `avikonai-hd-${image.id}.png`;
+
+      // Trigger download
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      // Clean up
+      URL.revokeObjectURL(downloadUrl);
+
+      addToast({
+        type: 'success',
+        title: 'Download Complete',
+        message: 'Your HD image has been downloaded successfully.'
+      });
+    } catch (error) {
+      console.error('Download failed:', error);
+      addToast({
+        type: 'error',
+        title: 'Download Failed',
+        message: 'Unable to download the image. Please try again.'
+      });
+    }
   };
 
   const handleShare = () => {
